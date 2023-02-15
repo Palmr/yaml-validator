@@ -107,10 +107,7 @@ pub trait YamlUtils {
         optional: &[&'schema str],
     ) -> Result<&Hash, GenericError<'schema>>;
 
-    fn check_exclusive_fields(
-        &self,
-        exclusive_keys: &[&'static str],
-    ) -> Result<(), SchemaError>;
+    fn check_exclusive_fields(&self, exclusive_keys: &[&'static str]) -> Result<(), SchemaError>;
 }
 
 impl YamlUtils for Yaml {
@@ -183,10 +180,7 @@ impl YamlUtils for Yaml {
         }
     }
 
-    fn check_exclusive_fields(
-        &self,
-        exclusive_keys: &[&'static str],
-    ) -> Result<(), SchemaError> {
+    fn check_exclusive_fields(&self, exclusive_keys: &[&'static str]) -> Result<(), SchemaError> {
         let hash = self.as_type("hash", Yaml::as_hash)?;
 
         let conflicts: Vec<&'static str> = exclusive_keys

@@ -93,7 +93,11 @@ pub struct ValidationError<'a> {
 }
 
 impl<'a> ValidationError<'a> {
-    fn flatten<A: AsRef<str>>(&self, fmt: &mut std::fmt::Formatter<'_>, root: A) -> std::fmt::Result {
+    fn flatten<A: AsRef<str>>(
+        &self,
+        fmt: &mut std::fmt::Formatter<'_>,
+        root: A,
+    ) -> std::fmt::Result {
         match &self.kind {
             ValidationErrorKind::Multiple { errors } => {
                 for err in errors {
