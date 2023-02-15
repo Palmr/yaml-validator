@@ -2,7 +2,7 @@ use std::convert::TryFrom;
 use std::fs::read;
 use std::path::Path;
 use std::path::PathBuf;
-use structopt::StructOpt;
+use clap::Parser;
 use yaml_validator::{
     yaml_rust::{Yaml, YamlLoader},
     Context, Validate,
@@ -11,27 +11,25 @@ use yaml_validator::{
 mod error;
 use error::Error;
 
-#[derive(Debug, StructOpt)]
-#[structopt(
+#[derive(Debug, Parser)]
+#[command(
     name = "yaml-validator-cli",
     about = "    Command-line interface to the yaml-validator library.
     Use it to validate YAML files against a context of any number of cross-referencing schema files.
     The schema format is proprietary, and does not offer compatibility with any other known YAML tools"
 )]
 struct Opt {
-    #[structopt(
-        parse(from_os_str),
+    #[clap(
         short,
         long = "schema",
         help = "Schemas to include in context to validate against. Schemas are added in order, but do not validate references to other schemas upon loading."
     )]
     schemas: Vec<PathBuf>,
 
-    #[structopt(short, long, help = "URI of the schema to validate the files against.")]
+    #[clap(short, long, help = "URI of the schema to validate the files against.")]
     uri: String,
 
-    #[structopt(
-        parse(from_os_str),
+    #[clap(
         help = "Files to validate against the selected schemas."
     )]
     files: Vec<PathBuf>,
@@ -122,7 +120,7 @@ fn actual_main(opt: &Opt) -> Result<(), Error> {
 }
 
 fn main() {
-    let opt = Opt::from_args();
+    let opt = Opt::parse();
 
     match actual_main(&opt) {
         Ok(()) => println!("all files validated successfully!"),
