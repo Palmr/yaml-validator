@@ -2,7 +2,7 @@
 name = "yaml-validator-cli"
 version = "0.1.1"
 authors = ["Mathias Pius <contact@pius.io>"]
-edition = "2018"
+edition = "2021"
 description = "A command-line interface to the yaml-validator library"
 repository = "https://github.com/MathiasPius/yaml-validator"
 readme = "../README.md"
