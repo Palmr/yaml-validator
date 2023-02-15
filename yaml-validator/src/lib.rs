@@ -21,7 +21,7 @@ use errors::ValidationError;
 use crate::types::bool::SchemaBool;
 use utils::{CondenseErrors, OptionalLookup, YamlUtils};
 
-/// Validation trait implemented by all types, as well as the [Schema](crate::Schema) type
+/// Validation trait implemented by all types, as well as the [Schema](Schema) type
 pub trait Validate<'yaml, 'schema: 'yaml> {
     fn validate(
         &self,

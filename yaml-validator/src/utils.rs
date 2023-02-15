@@ -12,7 +12,7 @@ pub trait UnitValue: Sub + Copy + PartialOrd + Default + Display {
 
 impl UnitValue for f64 {
     const ZERO: f64 = 0.0;
-    const UNIT: f64 = std::f64::MIN_POSITIVE;
+    const UNIT: f64 = f64::MIN_POSITIVE;
 }
 
 impl UnitValue for i64 {
@@ -88,7 +88,7 @@ pub(crate) fn load_simple(source: &'static str) -> Yaml {
 pub trait YamlUtils {
     fn type_to_str(&self) -> &'static str;
 
-    fn as_type<'a, F, T>(&'a self, expected: &'static str, cast: F) -> Result<T, GenericError<'a>>
+    fn as_type<'a, F, T>(&'a self, expected: &'static str, cast: F) -> Result<T, GenericError>
     where
         F: FnOnce(&'a Yaml) -> Option<T>;
 
@@ -107,10 +107,10 @@ pub trait YamlUtils {
         optional: &[&'schema str],
     ) -> Result<&Hash, GenericError<'schema>>;
 
-    fn check_exclusive_fields<'schema>(
-        &'schema self,
+    fn check_exclusive_fields(
+        &self,
         exclusive_keys: &[&'static str],
-    ) -> Result<(), SchemaError<'schema>>;
+    ) -> Result<(), SchemaError>;
 }
 
 impl YamlUtils for Yaml {
@@ -128,7 +128,7 @@ impl YamlUtils for Yaml {
         }
     }
 
-    fn as_type<'a, F, T>(&'a self, expected: &'static str, cast: F) -> Result<T, GenericError<'a>>
+    fn as_type<'a, F, T>(&'a self, expected: &'static str, cast: F) -> Result<T, GenericError>
     where
         F: FnOnce(&'a Yaml) -> Option<T>,
     {
@@ -183,10 +183,10 @@ impl YamlUtils for Yaml {
         }
     }
 
-    fn check_exclusive_fields<'schema>(
-        &'schema self,
+    fn check_exclusive_fields(
+        &self,
         exclusive_keys: &[&'static str],
-    ) -> Result<(), SchemaError<'schema>> {
+    ) -> Result<(), SchemaError> {
         let hash = self.as_type("hash", Yaml::as_hash)?;
 
         let conflicts: Vec<&'static str> = exclusive_keys

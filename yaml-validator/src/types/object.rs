@@ -69,7 +69,7 @@ impl<'yaml, 'schema: 'yaml> Validate<'yaml, 'schema> for SchemaObject<'schema> {
             let item = yaml
                 .lookup(name, "yaml", Option::from)
                 .into_optional()
-                .map(Option::Some)
+                .map(Some)
                 .map_err(ValidationError::from)
                 .map_err(ValidationError::add_path_name(name))?
                 .flatten();
