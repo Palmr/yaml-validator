@@ -84,7 +84,7 @@ mod tests {
                 ]
             }
             .into()
-        )
+        );
     }
 
     #[test]

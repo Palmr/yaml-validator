@@ -10,8 +10,10 @@ mod errors;
 mod modifiers;
 mod types;
 mod utils;
-use modifiers::*;
-use types::*;
+use modifiers::{SchemaAllOf, SchemaAnyOf, SchemaNot, SchemaOneOf};
+use types::{
+    SchemaArray, SchemaHash, SchemaInteger, SchemaObject, SchemaReal, SchemaReference, SchemaString,
+};
 
 pub use errors::schema::{SchemaError, SchemaErrorKind};
 use errors::ValidationError;
@@ -58,6 +60,7 @@ impl<'schema> Context<'schema> {
     /// context.get_schema("just-a-number").unwrap()
     ///     .validate(&context, &document).unwrap();
     /// ```
+    #[must_use]
     pub fn get_schema(&self, uri: &str) -> Option<&Schema<'schema>> {
         self.schemas.get(uri)
     }

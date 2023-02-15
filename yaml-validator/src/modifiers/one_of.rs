@@ -105,7 +105,7 @@ mod tests {
                 ]
             }
             .into()
-        )
+        );
     }
 
     #[test]
@@ -140,7 +140,7 @@ mod tests {
                 ValidationErrorKind::ValidationError { error: "multiple branches of oneOf validated successfully. oneOf must only contain a single valid branch"}.with_path_index(0),
                 ValidationErrorKind::ValidationError { error: "multiple branches of oneOf validated successfully. oneOf must only contain a single valid branch"}.with_path_index(1),
             ]}.with_path_name("oneOf")
-        )
+        );
     }
 
     #[test]

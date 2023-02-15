@@ -255,8 +255,7 @@ mod tests {
                 expected: "hash",
                 actual: "array"
             }
-            .with_path_name("items")
-            .into(),
+            .with_path_name("items"),
         );
     }
 
@@ -543,7 +542,7 @@ mod tests {
                 error: "array contains more than maxItems items"
             }
             .into()
-        )
+        );
     }
 
     #[test]
@@ -566,7 +565,7 @@ mod tests {
                 error: "array contains fewer than minItems items"
             }
             .into()
-        )
+        );
     }
 
     #[test]

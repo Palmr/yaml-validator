@@ -61,8 +61,8 @@ impl<'a> std::fmt::Display for Breadcrumb<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for segment in self.segments.iter().rev() {
             match segment {
-                BreadcrumbSegment::Name(name) => write!(f, ".{}", name)?,
-                BreadcrumbSegment::Index(index) => write!(f, "[{}]", index)?,
+                BreadcrumbSegment::Name(name) => write!(f, ".{name}")?,
+                BreadcrumbSegment::Index(index) => write!(f, "[{index}]")?,
             };
         }
 

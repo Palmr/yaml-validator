@@ -24,7 +24,7 @@ pub enum SchemaErrorKind<'a> {
     Multiple { errors: Vec<SchemaError<'a>> },
 }
 
-/// A wrapper type around SchemaErrorKind containing path information about where the error occurred.
+/// A wrapper type around `SchemaErrorKind` containing path information about where the error occurred.
 #[derive(Debug, PartialEq, Eq)]
 pub struct SchemaError<'schema> {
     pub kind: SchemaErrorKind<'schema>,
@@ -32,14 +32,18 @@ pub struct SchemaError<'schema> {
 }
 
 impl<'a> SchemaError<'a> {
-    fn flatten(&self, fmt: &mut std::fmt::Formatter<'_>, root: String) -> std::fmt::Result {
+    fn flatten<A: AsRef<str>>(
+        &self,
+        fmt: &mut std::fmt::Formatter<'_>,
+        root: A,
+    ) -> std::fmt::Result {
         match &self.kind {
             SchemaErrorKind::Multiple { errors } => {
                 for err in errors {
-                    err.flatten(fmt, format!("{}{}", root, self.state))?;
+                    err.flatten(fmt, format!("{}{}", root.as_ref(), self.state))?;
                 }
             }
-            err => writeln!(fmt, "{}{}: {}", root, self.state, err)?,
+            err => writeln!(fmt, "{}{}: {}", root.as_ref(), self.state, err)?,
         }
 
         Ok(())
@@ -62,11 +66,12 @@ impl<'a> SchemaError<'a> {
 
 impl<'a> std::fmt::Display for SchemaError<'a> {
     fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.flatten(fmt, "#".to_string())
+        self.flatten(fmt, "#")
     }
 }
 
 impl<'a> SchemaErrorKind<'a> {
+    #[must_use]
     pub fn with_path(self, path: BreadcrumbSegmentVec<'a>) -> SchemaError<'a> {
         SchemaError {
             kind: self,
@@ -74,12 +79,14 @@ impl<'a> SchemaErrorKind<'a> {
         }
     }
 
+    #[must_use]
     pub fn with_path_name(self, path: &'a str) -> SchemaError<'a> {
         let mut err: SchemaError = self.into();
         err.state.push(BreadcrumbSegment::Name(path));
         err
     }
 
+    #[must_use]
     pub fn with_path_index(self, index: usize) -> SchemaError<'a> {
         let mut err: SchemaError = self.into();
         err.state.push(BreadcrumbSegment::Index(index));
@@ -129,7 +136,7 @@ impl<'a> From<GenericError<'a>> for SchemaError<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::types::*;
+    use crate::types::SchemaObject;
     use crate::utils::load_simple;
     use crate::{Context, Validate};
     use std::convert::TryFrom;
@@ -154,7 +161,7 @@ mod tests {
         let err = SchemaObject::try_from(&yaml).unwrap_err();
 
         assert_eq!(
-            format!("{}", err),
+            format!("{err}"),
             "#.items.something.items.level2.items.leaf: field \'type\' missing\n",
         );
     }
@@ -198,7 +205,7 @@ mod tests {
         let err = schema.validate(&ctx, &document).unwrap_err();
 
         assert_eq!(
-            format!("{}", err),
+            format!("{err}"),
             r#"#.something.level2[0].num: wrong type, expected integer got string
 #.something.level2[1].num: wrong type, expected integer got hash
 #.something.level2[2].num: wrong type, expected integer got array

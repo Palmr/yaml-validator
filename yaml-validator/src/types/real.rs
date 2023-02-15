@@ -188,7 +188,7 @@ mod tests {
             SchemaErrorKind::MalformedField {
                 error: "conflicting constraints: minimum, exclusiveMinimum cannot be used at the same time".into()
             }.into()
-        )
+        );
     }
 
     #[test]
@@ -218,7 +218,7 @@ mod tests {
                 error: "range given for real value spans 0 possible values".into()
             }
             .into()
-        )
+        );
     }
 
     #[test]
@@ -309,7 +309,7 @@ mod tests {
                 .validate(&Context::default(), &load_simple("10.0"))
                 .unwrap_err(),
             ValidationErrorKind::ValidationError {
-                error: "value violates lower limit constraint".into()
+                error: "value violates lower limit constraint"
             }
             .into()
         );
@@ -345,7 +345,7 @@ mod tests {
                 .validate(&Context::default(), &load_simple("5.0"))
                 .unwrap_err(),
             ValidationErrorKind::ValidationError {
-                error: "value violates lower limit constraint".into()
+                error: "value violates lower limit constraint"
             }
             .into()
         );
@@ -366,7 +366,7 @@ mod tests {
                 .validate(&Context::default(), &load_simple("10.0"))
                 .unwrap_err(),
             ValidationErrorKind::ValidationError {
-                error: "value violates upper limit constraint".into()
+                error: "value violates upper limit constraint"
             }
             .into()
         );

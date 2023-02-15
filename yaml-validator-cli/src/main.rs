@@ -66,17 +66,17 @@ fn load_yaml(filenames: &[PathBuf]) -> Result<Vec<Yaml>, Vec<Error>> {
         })
         .partition(Result::is_ok);
 
-    if !errs.is_empty() {
-        Err(errs.into_iter().map(Result::unwrap_err).collect())
-    } else {
+    if errs.is_empty() {
         Ok(yaml.into_iter().flat_map(Result::unwrap).collect())
+    } else {
+        Err(errs.into_iter().map(Result::unwrap_err).collect())
     }
 }
 
 // Ideally this would just be the real main function, but since errors are
 // automatically printed using the Debug trait rather than Display, the error
 // messages are not very easy to read.
-fn actual_main(opt: Opt) -> Result<(), Error> {
+fn actual_main(opt: &Opt) -> Result<(), Error> {
     if opt.schemas.is_empty() {
         return Err(Error::Validation(
             "no schemas supplied, see the --schema option for information\n".into(),
@@ -124,10 +124,10 @@ fn actual_main(opt: Opt) -> Result<(), Error> {
 fn main() {
     let opt = Opt::from_args();
 
-    match actual_main(opt) {
+    match actual_main(&opt) {
         Ok(()) => println!("all files validated successfully!"),
         Err(e) => {
-            eprint!("{}", e);
+            eprint!("{e}");
             std::process::exit(1);
         }
     }
@@ -138,7 +138,7 @@ mod tests {
     use super::*;
     #[test]
     fn test_all_types_example() {
-        actual_main(Opt {
+        actual_main(&Opt {
             schemas: vec!["../examples/all-types/schema.yaml".into()],
             files: vec!["../examples/all-types/customers.yaml".into()],
             uri: "customer-list".into(),
@@ -148,7 +148,7 @@ mod tests {
 
     #[test]
     fn test_multiple_schemas_example() {
-        actual_main(Opt {
+        actual_main(&Opt {
             schemas: vec![
                 "../examples/multiple-schemas/person-schema.yaml".into(),
                 "../examples/multiple-schemas/phonebook-schema.yaml".into(),
@@ -161,7 +161,7 @@ mod tests {
 
     #[test]
     fn test_nesting_example() {
-        actual_main(Opt {
+        actual_main(&Opt {
             schemas: vec!["../examples/nesting/schema.yaml".into()],
             files: vec!["../examples/nesting/mybook.yaml".into()],
             uri: "phonebook".into(),
@@ -172,7 +172,7 @@ mod tests {
     #[test]
     fn test_locating_errors_example() {
         assert_eq!(
-            actual_main(Opt {
+            actual_main(&Opt {
                 schemas: vec!["../examples/locating-errors/schema.yaml".into()],
                 files: vec!["../examples/locating-errors/phonebook.yaml".into()],
                 uri: "phonebook".into(),
@@ -192,7 +192,7 @@ mod tests {
     #[test]
     fn test_branching_examples() {
         assert_eq!(
-            actual_main(Opt {
+            actual_main(&Opt {
                 schemas: vec!["../examples/branching/schema.yaml".into()],
                 files: vec!["../examples/branching/usernames.yaml".into()],
                 uri: "user-list".into(),
@@ -210,10 +210,10 @@ mod tests {
     #[test]
     fn test_non_existent_schema_file() {
         assert_eq!(
-            actual_main(Opt {
+            actual_main(&Opt {
                 schemas: vec!["not_found.yaml".into()],
                 files: vec!["".into()],
-                uri: "".into(),
+                uri: String::new(),
             })
             .unwrap_err(),
             Error::Multiple(vec![Error::File(
@@ -226,7 +226,7 @@ mod tests {
     #[test]
     fn test_non_existent_file() {
         assert_eq!(
-            actual_main(Opt {
+            actual_main(&Opt {
                 schemas: vec!["../examples/nesting/schema.yaml".into()],
                 files: vec!["not_found.yaml".into()],
                 uri: "person".into(),
@@ -242,7 +242,7 @@ mod tests {
     #[test]
     fn test_unknown_schema_uri() {
         assert_eq!(
-            actual_main(Opt {
+            actual_main(&Opt {
                 schemas: vec!["../examples/nesting/schema.yaml".into()],
                 files: vec!["../examples/nesting/mybook.yaml".into()],
                 uri: "not-found".into(),

@@ -93,14 +93,14 @@ pub struct ValidationError<'a> {
 }
 
 impl<'a> ValidationError<'a> {
-    fn flatten(&self, fmt: &mut std::fmt::Formatter<'_>, root: String) -> std::fmt::Result {
+    fn flatten<A: AsRef<str>>(&self, fmt: &mut std::fmt::Formatter<'_>, root: A) -> std::fmt::Result {
         match &self.kind {
             ValidationErrorKind::Multiple { errors } => {
                 for err in errors {
-                    err.flatten(fmt, format!("{}{}", root, self.state))?;
+                    err.flatten(fmt, format!("{}{}", root.as_ref(), self.state))?;
                 }
             }
-            err => writeln!(fmt, "{}{}: {}", root, self.state, err)?,
+            err => writeln!(fmt, "{}{}: {}", root.as_ref(), self.state, err)?,
         }
 
         Ok(())
@@ -123,6 +123,6 @@ impl<'a> ValidationError<'a> {
 
 impl<'a> std::fmt::Display for ValidationError<'a> {
     fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.flatten(fmt, "#".to_string())
+        self.flatten(fmt, "#")
     }
 }

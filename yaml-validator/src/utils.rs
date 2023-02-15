@@ -52,10 +52,10 @@ where
         let unit = <<T as Sub>::Output as UnitValue>::UNIT;
 
         match (self, upper) {
-            (Limit::Inclusive(lower), Limit::Inclusive(upper)) => (*upper - *lower) >= zero,
             (Limit::Exclusive(lower), Limit::Exclusive(upper)) => (*upper - *lower) > unit,
-            (Limit::Exclusive(lower), Limit::Inclusive(upper)) => (*upper - *lower) >= zero,
-            (Limit::Inclusive(lower), Limit::Exclusive(upper)) => (*upper - *lower) >= zero,
+            (Limit::Inclusive(lower), Limit::Exclusive(upper))
+            | (Limit::Inclusive(lower), Limit::Inclusive(upper))
+            | (Limit::Exclusive(lower), Limit::Inclusive(upper)) => (*upper - *lower) >= zero,
         }
     }
 }
@@ -149,8 +149,7 @@ impl YamlUtils for Yaml {
     {
         let value = self.index(field);
         match value {
-            Yaml::BadValue => Err(GenericError::FieldMissing { field }),
-            Yaml::Null => Err(GenericError::FieldMissing { field }),
+            Yaml::BadValue | Yaml::Null => Err(GenericError::FieldMissing { field }),
             content => content.as_type(expected, cast),
         }
     }
@@ -165,7 +164,7 @@ impl YamlUtils for Yaml {
         let missing = required
             .iter()
             .filter(|field| !hash.contains_key(&Yaml::String((**field).to_string())))
-            .map(|field| GenericError::FieldMissing { field: *field });
+            .map(|field| GenericError::FieldMissing { field });
 
         let extra = hash
             .keys()
@@ -256,7 +255,7 @@ pub trait CondenseErrors<T>: Sized {
     fn condense_errors(results: &mut dyn Iterator<Item = Result<T, Self>>) -> Result<Vec<T>, Self>;
 }
 
-impl<'a, T, E> CondenseErrors<T> for E
+impl<T, E> CondenseErrors<T> for E
 where
     T: Debug,
     E: From<Vec<Self>> + Debug,

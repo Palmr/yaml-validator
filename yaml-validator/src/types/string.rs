@@ -58,7 +58,7 @@ impl<'schema> TryFrom<&'schema Yaml> for SchemaString {
                 .map(|inner| {
                     regex::Regex::new(inner).map_err(|e| {
                         SchemaErrorKind::MalformedField {
-                            error: format!("{}", e),
+                            error: format!("{e}"),
                         }
                         .with_path_name("pattern")
                     })
